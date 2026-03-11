@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: services
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - list:
+        elements:
+        - srv: service-a
+          chartVersion: 22.6.1
+        - srv: service-b
+          chartVersion: 22.6.0
+  template:
+    metadata:
+      name: '{{srv}}'
+      labels:
+        app-component: '{{srv}}'
+    spec:
+      destination:
+        name: in-cluster
+        namespace: 
+      project: default
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            maxDuration: 3m0s
+            factor: 2
+        syncOptions:
+          - CreateNamespace=true
+      sources:
+        - repoURL: 'https://charts.bitnami.com/bitnami'
+          targetRevision: '{{chartVersion}}'
+          chart: nginx
+          helm:
+            releaseName: '{{srv}}'
+            valueFiles:
+              - $values/services/{{srv}}/values.yaml
+        - repoURL: 'https://github.com/tomas-rojo/argocd-test.git'
+          targetRevision: main
+          ref: values
