@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: services
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: service-a
+            values: services/service-a/values.yaml
+          - name: service-b
+            values: services/service-b/values.yaml
+
+  template:
+    metadata:
+      name: '{{name}}'
+      annotations:
+        argocd.argoproj.io/sync-wave: "1"
+
+    spec:
+      project: default
+
+      source:
+        repoURL: https://charts.bitnami.com/bitnami
+        chart: nginx
+        targetRevision: 22.6.1
+
+        helm:
+          valueFiles:
+            - '{{values}}'
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: app
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

@@ -1,20 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: outbox
+  name: infrastructure
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
 
   source:
     repoURL: https://github.com/tomas-rojo/argocd-test.git
     targetRevision: main
-    path: services
+    path: infrastructure
 
   destination:
-    name: in-cluster
+    server: https://kubernetes.default.svc
     namespace: app
 
   syncPolicy:

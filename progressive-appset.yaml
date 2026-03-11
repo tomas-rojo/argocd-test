@@ -1,27 +1,31 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: application-set
+  name: progressive
   namespace: argocd
 spec:
   generators:
     - list:
         elements:
           - name: infrastructure
-            path: definitions/infrastructure
+            path: definitions/infrastructure.yaml
           - name: services
-            path: definitions/services
+            path: definitions/services.yaml
           - name: outbox
-            path: definitions/outbox
+            path: definitions/outbox.yaml
+
   template:
     metadata:
       name: '{{name}}'
+
     spec:
       project: default
+
       source:
         repoURL: https://github.com/tomas-rojo/argocd-test.git
         targetRevision: main
-        path: '{{path}}'
+        path: definitions
+
       destination:
         server: https://kubernetes.default.svc
         namespace: argocd

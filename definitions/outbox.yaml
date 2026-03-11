@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: outbox
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: outbox-a
+            values: services/outbox-a/values.yaml
+          - name: outbox-b
+            values: services/outbox-b/values.yaml
+
+  template:
+    metadata:
+      name: '{{name}}'
+      annotations:
+        argocd.argoproj.io/sync-wave: "2"
+
+    spec:
+      project: default
+
+      source:
+        repoURL: https://charts.bitnami.com/bitnami
+        chart: nginx
+        targetRevision: 22.6.1
+
+        helm:
+          valueFiles:
+            - '{{values}}'
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: app
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
