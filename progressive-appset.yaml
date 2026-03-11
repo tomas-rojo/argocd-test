@@ -1,60 +1,27 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: application
+  name: application-set
   namespace: argocd
 spec:
   generators:
-  - list:
-      elements:
-      - srv: infrastructure
-        path: definitions/infrastructure/
-      - srv: services
-        path: definitions/services/
-      - srv: outbox
-        path: definitions/outbox/
-  strategy:
-    type: RollingSync
-    rollingSync:
-      steps:
-        - matchExpressions:
-            - key: app-component
-              operator: In
-              values:
-                - infrastructure
-        - matchExpressions:
-            - key: app-component
-              operator: In
-              values:
-                - services
-        - matchExpressions:
-            - key: app-component
-              operator: In
-              values:
-                - outbox
+    - list:
+        elements:
+          - name: infrastructure
+            path: definitions/infrastructure
+          - name: services
+            path: definitions/services
+          - name: outbox
+            path: definitions/outbox
   template:
     metadata:
-      name: '{{srv}}'
-      labels:
-        app-component: '{{srv}}'
+      name: '{{name}}'
     spec:
       project: default
       source:
-        repoURL: 'https://github.com/tomas-rojo/argocd-test.git'
+        repoURL: https://github.com/tomas-rojo/argocd-test.git
         targetRevision: main
         path: '{{path}}'
       destination:
-        name: in-cluster
-        namespace: app
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-        retry:
-          limit: 5
-          backoff:
-            duration: 5s
-            maxDuration: 3m0s
-            factor: 2
-        syncOptions:
-          - CreateNamespace=true
+        server: https://kubernetes.default.svc
+        namespace: argocd
