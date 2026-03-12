@@ -18,10 +18,11 @@ spec:
     metadata:
       name: '{{.name}}'
     spec:
-      project: default
+      source: {}
       destination:
         server: https://kubernetes.default.svc
         namespace: app
+      project: default
       syncPolicy:
         automated:
           prune: true
