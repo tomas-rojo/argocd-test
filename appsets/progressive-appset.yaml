@@ -4,6 +4,7 @@ metadata:
   name: platform
   namespace: argocd
 spec:
+  goTemplate: true
   generators:
   - list:
       elements:
