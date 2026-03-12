@@ -33,6 +33,7 @@ spec:
           chart: nginx
           targetRevision: '{{.chartVersion}}'
           helm:
+            releaseName: '{{.name}}'
             valueFiles:
               - $values/services/{{.name}}/values.yaml
         - repoURL: https://github.com/tomas-rojo/argocd-test.git
