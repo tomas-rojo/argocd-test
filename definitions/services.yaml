@@ -16,7 +16,7 @@ spec:
             chartVersion: 22.6.0
   template:
     metadata:
-      name: '{{name}}'
+      name: '{{.name}}'
     spec:
       project: default
       destination:
@@ -31,10 +31,10 @@ spec:
       sources:
         - repoURL: https://charts.bitnami.com/bitnami
           chart: nginx
-          targetRevision: '{{chartVersion}}'
+          targetRevision: '{{.chartVersion}}'
           helm:
             valueFiles:
-              - $values/services/{{name}}/values.yaml
+              - $values/services/{{.name}}/values.yaml
         - repoURL: https://github.com/tomas-rojo/argocd-test.git
           targetRevision: main
           ref: values
