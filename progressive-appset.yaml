@@ -1,22 +1,46 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: progressive
+  name: platform
   namespace: argocd
 spec:
   generators:
-    - list:
-        elements:
-          - name: infrastructure
-            path: definitions/infrastructure.yaml
-          - name: services
-            path: definitions/services.yaml
-          - name: outbox
-            path: definitions/outbox.yaml
+  - list:
+      elements:
+
+      # 1️⃣ Infrastructure
+      - name: infrastructure
+        type: git
+        path: infrastructure
+        wave: "0"
+
+      # 2️⃣ Services
+      - name: service-a
+        type: helm
+        values: services/service-a/values.yaml
+        wave: "1"
+
+      - name: service-b
+        type: helm
+        values: services/service-b/values.yaml
+        wave: "1"
+
+      # 3️⃣ Outbox
+      - name: outbox-a
+        type: helm
+        values: services/outbox-a/values.yaml
+        wave: "2"
+
+      - name: outbox-b
+        type: helm
+        values: services/outbox-b/values.yaml
+        wave: "2"
 
   template:
     metadata:
       name: '{{name}}'
+      annotations:
+        argocd.argoproj.io/sync-wave: '{{wave}}'
 
     spec:
       project: default
@@ -24,8 +48,13 @@ spec:
       source:
         repoURL: https://github.com/tomas-rojo/argocd-test.git
         targetRevision: main
-        path: definitions
+        path: '{{path}}'
 
       destination:
         server: https://kubernetes.default.svc
-        namespace: argocd
+        namespace: app
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
