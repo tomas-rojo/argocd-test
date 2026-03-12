@@ -21,14 +21,20 @@ spec:
     spec:
       project: default
 
-      source:
-        repoURL: https://charts.bitnami.com/bitnami
-        chart: nginx
-        targetRevision: 22.6.1
+      # ⚠️ Changed from 'source' to 'sources' (plural)
+      sources:
+        # Source 1: Git repo with values files
+        - repoURL: https://github.com/tomas-rojo/argocd-test.git
+          targetRevision: main
+          ref: values
 
-        helm:
-          valueFiles:
-            - '{{values}}'
+        # Source 2: Helm chart
+        - repoURL: https://charts.bitnami.com/bitnami
+          chart: nginx
+          targetRevision: 22.6.1
+          helm:
+            valueFiles:
+              - $values/{{values}}  # ⚠️ Added $values/ prefix
 
       destination:
         server: https://kubernetes.default.svc

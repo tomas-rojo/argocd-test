@@ -4,42 +4,22 @@ metadata:
   name: platform
   namespace: argocd
 spec:
-  goTemplate: true
   generators:
   - list:
       elements:
-
-      # 1️⃣ Infrastructure
       - name: infrastructure
-        type: git
-        path: infrastructure
+        path: definitions/infrastructure.yaml
         wave: "0"
-
-      # 2️⃣ Services
-      - name: service-a
-        type: helm
-        values: services/service-a/values.yaml
+      - name: services
+        path: definitions/services.yaml
         wave: "1"
-
-      - name: service-b
-        type: helm
-        values: services/service-b/values.yaml
-        wave: "1"
-
-      # 3️⃣ Outbox
-      - name: outbox-a
-        type: helm
-        values: services/outbox-a/values.yaml
-        wave: "2"
-
-      - name: outbox-b
-        type: helm
-        values: services/outbox-b/values.yaml
+      - name: outbox
+        path: definitions/outbox.yaml
         wave: "2"
 
   template:
     metadata:
-      name: '{{name}}'
+      name: 'platform-{{name}}'
       annotations:
         argocd.argoproj.io/sync-wave: '{{wave}}'
 
@@ -53,7 +33,7 @@ spec:
 
       destination:
         server: https://kubernetes.default.svc
-        namespace: app
+        namespace: argocd  # ⚠️ Deploy to argocd namespace (where ArgoCD lives)
 
       syncPolicy:
         automated:
