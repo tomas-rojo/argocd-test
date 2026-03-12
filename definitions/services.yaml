@@ -14,21 +14,13 @@ spec:
             chartVersion: 22.6.1
           - name: service-b
             chartVersion: 22.6.0
+
   template:
     metadata:
       name: '{{.name}}'
     spec:
-      source: {}
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: app
       project: default
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-  templatePatch: |
-    spec:
+
       sources:
         - repoURL: https://charts.bitnami.com/bitnami
           chart: nginx
@@ -37,6 +29,16 @@ spec:
             releaseName: '{{.name}}'
             valueFiles:
               - $values/services/{{.name}}/values.yaml
+
         - repoURL: https://github.com/tomas-rojo/argocd-test.git
           targetRevision: main
           ref: values
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: app
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
