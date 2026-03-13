@@ -35,13 +35,13 @@ spec:
               values: ["platform-outbox"]
   template:
     metadata:
-      name: 'platform-{{name}}'
+      name: 'platform-{{.name}}'
     spec:
       project: default
       source:
         repoURL: https://github.com/tomas-rojo/argocd-test.git
         targetRevision: main
-        path: 'definitions/{{path}}'
+        path: 'definitions/{{.path}}'
       destination:
         server: https://kubernetes.default.svc
         namespace: argocd
