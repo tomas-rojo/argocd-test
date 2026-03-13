@@ -3,38 +3,46 @@ kind: ApplicationSet
 metadata:
   name: platform
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   generators:
   - list:
       elements:
       - name: infrastructure
-        path: definitions/infrastructure.yaml
-        wave: "0"
+        path: infrastructure
       - name: services
-        path: definitions/services.yaml
-        wave: "1"
+        path: services
       - name: outbox
-        path: definitions/outbox.yaml
-        wave: "2"
-
+        path: services
+  strategy:
+    type: RollingSync
+    rollingSync:
+      steps:
+        - matchExpressions:
+            - key: metadata.name
+              operator: In
+              values: ["platform-infrastructure"]
+        - matchExpressions:
+            - key: metadata.name
+              operator: In
+              values: ["platform-services"]
+        - matchExpressions:
+            - key: metadata.name
+              operator: In
+              values: ["platform-outbox"]
   template:
     metadata:
       name: 'platform-{{name}}'
-      annotations:
-        argocd.argoproj.io/sync-wave: '{{wave}}'
-
     spec:
       project: default
-
       source:
         repoURL: https://github.com/tomas-rojo/argocd-test.git
         targetRevision: main
-        path: '{{path}}'
-
+        path: '{{path}}/{{name}}/values.yaml'
       destination:
         server: https://kubernetes.default.svc
-        namespace: argocd  # ⚠️ Deploy to argocd namespace (where ArgoCD lives)
-
+        namespace: argocd
       syncPolicy:
         automated:
           prune: true
