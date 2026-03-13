@@ -22,12 +22,6 @@ spec:
       destination:
         server: https://kubernetes.default.svc
         namespace: app
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-  templatePatch: |
-    spec:
       sources:
         - repoURL: https://charts.bitnami.com/bitnami
           chart: nginx
@@ -39,3 +33,7 @@ spec:
         - repoURL: https://github.com/tomas-rojo/argocd-test.git
           targetRevision: main
           ref: values
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
