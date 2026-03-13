@@ -16,7 +16,7 @@ spec:
       - name: services
         path: services
       - name: outbox
-        path: services
+        path: outbox
   strategy:
     type: RollingSync
     rollingSync:

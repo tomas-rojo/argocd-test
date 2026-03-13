@@ -3,8 +3,8 @@ kind: ApplicationSet
 metadata:
   name: services
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   goTemplate: true
   generators:
@@ -14,7 +14,6 @@ spec:
             chartVersion: 22.6.1
           - name: service-b
             chartVersion: 22.6.0
-
   template:
     metadata:
       name: '{{.name}}'
