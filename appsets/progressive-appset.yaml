@@ -22,20 +22,23 @@ spec:
     rollingSync:
       steps:
         - matchExpressions:
-            - key: metadata.name
+            - key: component
               operator: In
-              values: ["platform-infrastructure"]
+              values:
+                - infrastructure"
         - matchExpressions:
-            - key: metadata.name
+            - key: component
               operator: In
-              values: ["platform-services"]
+              values: ["services"]
         - matchExpressions:
-            - key: metadata.name
+            - key: component
               operator: In
-              values: ["platform-outbox"]
+              values: ["outbox"]
   template:
     metadata:
       name: 'platform-{{.name}}'
+      labels:
+        component: '{{.name}}'
     spec:
       project: default
       source:
